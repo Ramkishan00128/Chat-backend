@@ -65,15 +65,15 @@ export class ChattyServer {
     applicationRoutes(app);
   }
 
-  private globalErrorHandler(app: Application): void {
+ private globalErrorHandler(app: Application): void {
     app.all('*', (req: Request, res: Response) => {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
 
-    app.use((error: IErrorResponse, req: Request, res: Response, next: NextFunction) => {
+    app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.error(error);
       if (error instanceof CustomError) {
-        return res.status(error.statusCode).json(error.serializeError());
+        return res.status(error.statusCode).json(error.serializeErrors());
       }
       next();
     });
@@ -114,6 +114,6 @@ export class ChattyServer {
   }
 
   private socketIOconnections(io: Server): void {
-    log.info('socketConnection',io);
+    log.info('socketConnection');
   }
 }
