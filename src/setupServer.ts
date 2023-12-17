@@ -71,9 +71,8 @@ export class ChattyServer {
     });
 
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-      log.error(error);
       if (error instanceof CustomError) {
-        return res.status(error.statusCode).json(error.serializeErrors());
+          res.status(error.statusCode).json(error.serializeErrors());
       }
       next();
     });
@@ -99,19 +98,19 @@ export class ChattyServer {
     });
     const pubClient = createClient({ url: config.REDIS_HOST });
     const subClient = pubClient.duplicate();
-    log.info('Connecting to Redis...');
-    await Promise.all([pubClient.connect, subClient.connect]);
-    log.info('Connected to Redis successfully!');
+    await Promise.all([pubClient.connect(), subClient.connect()]);
     io.adapter(createAdapter(pubClient, subClient));
     return io;
   }
 
   private startHttpServer(httpServer: http.Server): void {
+    log.info(`Worker with process id of ${process.pid} has started...`);
     log.info(`Server has started with process ${process.pid}`);
     httpServer.listen(SERVER_PORT, () => {
-      log.info(`Server is running on ${SERVER_PORT}`);
+      log.info(`Server running on port ${SERVER_PORT}`);
     });
   }
+
 
   private socketIOconnections(io: Server): void {
     log.info('socketConnection');
